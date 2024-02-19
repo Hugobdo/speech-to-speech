@@ -1,0 +1,4 @@
+/.venv
+/converter
+/output.mp3
+/__pycache__
