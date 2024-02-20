@@ -1,16 +1,17 @@
 from openai import OpenAI
 
-class LocalChatModel:
+class MainChatModel:
     def __init__(self, base_url="http://localhost:1234/v1", api_key="not-needed", model="local-model"):
         self.client = OpenAI(base_url=base_url, api_key=api_key)
         self.model = model
         self.system_prompt = {
             "role": "system",
             "content": '''
-                Seu nome é HX3.
-                Você é amigável e responde sempre de forma casual da melhor forma possível.
-                Você é breve e direto, mas sempre educado.
-                Responda sempre de forma que pareça o mais humano possível.
+                Your name is HX3.
+                You are friendly and always respond casually to the best of your ability.
+                You are brief and direct, but always polite.
+                Always respond in a way that sounds as human as possible.
+                Keep all the sentences very short
             '''
         }
         self.memory = []  # Inicializa a memória para armazenar interações
@@ -23,6 +24,7 @@ class LocalChatModel:
                 model=self.model,
                 messages=messages,
                 temperature=temperature,
+                max_tokens=100
             )
             
             self.memory.append({"role": "user", "content": user_message})
@@ -38,7 +40,7 @@ class LocalChatModel:
         self.memory.clear()
 
 if __name__ == "__main__":
-    model = LocalChatModel()
+    model = MainChatModel()
     response = model.ask("Quem é você?")
     print(response)
 

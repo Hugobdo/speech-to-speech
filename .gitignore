@@ -1,4 +1,8 @@
-/.venv
-/converter
-/output.mp3
-/__pycache__
+__pycache__/
+.ipynb_checkpoints/
+processed
+outputs
+checkpoints
+trash
+examples*
+.env
