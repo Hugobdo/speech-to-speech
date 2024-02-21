@@ -14,3 +14,11 @@ cn2an==0.5.22
 jieba==0.42.1
 gradio==3.48.0
 langid==1.1.6
+torchdiffeq
+torchsde
+einops
+transformers>=4.25.1
+safetensors>=0.3.0
+aiohttp
+accelerate
+black
