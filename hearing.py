@@ -55,6 +55,12 @@ class AudioHandler:
             print("Gravação concluída.")
         return recording.flatten()
 
+    def check_audio_silence(self, audio, silence_threshold=15):
+        volume_norm = np.linalg.norm(audio)*10
+        if self.verbose:
+            print(f"Volume Normalizado: {volume_norm:.4f}, Limiar de Silêncio: {silence_threshold}")
+        return volume_norm < silence_threshold
+
     def record_continuous_audio(self, block_duration=0.5, silence_threshold=0.5):
         def callback(indata, frames, time, status):
             if status:

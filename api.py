@@ -177,8 +177,8 @@ class ToneColorConverter(OpenVoiceBaseClass):
             with torch.no_grad():
                 signal = torch.FloatTensor(trunck).to(device)[None]
                 message_tensor = torch.FloatTensor(message_npy).to(device)[None]
-                signal_wmd_tensor = self.watermark_model.encode(signal, message_tensor)
-                signal_wmd_npy = signal_wmd_tensor.detach().cpu().squeeze()
+                # signal_wmd_tensor = self.watermark_model.encode(signal, message_tensor)
+                signal_wmd_npy = signal.detach().cpu().squeeze()
             audio[(coeff * n) * K: (coeff * n + 1) * K] = signal_wmd_npy
         return audio
 

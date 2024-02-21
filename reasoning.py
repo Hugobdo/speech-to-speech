@@ -24,7 +24,7 @@ class MainChatModel:
                 model=self.model,
                 messages=messages,
                 temperature=temperature,
-                max_tokens=100
+                max_tokens=200
             )
             
             self.memory.append({"role": "user", "content": user_message})
