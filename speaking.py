@@ -62,7 +62,9 @@ class TextToSpeech:
         src_path = f'{self.output_dir}/tmp.wav'
 
         if self.custom_base:
-            # self.create_base_file()
+            if not os.path.exists(self.base_file):
+                print("Base file not found. Creating a new one.")
+                self.create_base_file()
             self.gtts_speaker(text, play_audio=False, save=True, filename=src_path)
             self.source_se, _ = se_extractor.get_se(self.base_file, self.tone_color_converter, vad=True)
         

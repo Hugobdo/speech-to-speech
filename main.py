@@ -26,6 +26,10 @@ class Robot:
             print("Transcrevendo áudio...")
         question_text = self.hearing.transcribe_audio(question_audio)
 
+        if question_text == "":
+            self.speaking.speak("Sorry, I didn't understand you. Can you repeat that?")
+            return
+        
         # stop if question contains stop
         if question_text.lower().split(" ")[-1].split('.')[0] == "stop":
             self.speaking.speak("See you later!")
