@@ -1,14 +1,22 @@
 from hearing import AudioHandler
 from reasoning import MainChatModel
 from speaking import TextToSpeech
+import json
 
 class Robot:
     def __init__(self, model_name="base", samplerate=16000, verbose=True):
+        self.persona = "alya"
+        with open(f"personas/{self.persona}.json", "r") as f:
+            self.config = json.load(f)
+
         self.hearing = AudioHandler(model_name=model_name, samplerate=samplerate)
-        self.reasoning = MainChatModel()
-        self.speaking = TextToSpeech(custom_base=False, speed=1, voice='example_reference.mp3')
+        self.reasoning = MainChatModel(
+            system_prompt=self.config['system'],
+            temperature=self.config['temperature'],
+            max_tokens=self.config['max_tokens'])
+        self.speaking = TextToSpeech(custom_base=False, speed=1, voice=self.config['voice'], speaker=self.config['speaker'])
         self.verbose = verbose
-        self.speaking.speak("Hello, I am your personal assistant. How can I help you?")
+        self.speaking.speak(self.config['greeting'])
 
     def listen_and_respond(self):
         while True:  # Continue tentando até que o áudio com som seja gravado

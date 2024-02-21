@@ -8,7 +8,7 @@ import se_extractor
 from api import BaseSpeakerTTS, ToneColorConverter
 
 class TextToSpeech:
-    def __init__(self, language='pt', tld="com.br", speed=1, custom_base=True, voice='example_reference.mp3', ckpt_path='checkpoints/converter', ckpt_base='checkpoints/base_speakers/EN'):
+    def __init__(self, language='pt', tld="com.br", speed=1, custom_base=True, voice='example_reference.mp3', ckpt_path='checkpoints/converter', ckpt_base='checkpoints/base_speakers/EN', speaker='default'):
         self.tld = tld
         self.language = language
         self.speed = speed
@@ -17,6 +17,7 @@ class TextToSpeech:
         self.base_file = f"{self.output_dir}/base.mp3"
         self.reference_file = f"resources/{voice}"
         self.output_path = fr'{self.output_dir}/output_crosslingual.wav'
+        self.speaker = speaker
         
         os.makedirs(self.output_dir, exist_ok=True)
         
@@ -69,7 +70,7 @@ class TextToSpeech:
             self.source_se, _ = se_extractor.get_se(self.base_file, self.tone_color_converter, vad=True)
         
         else:
-            self.base_speaker_tts.tts(text, src_path, speaker='default', language='English', speed=self.speed)
+            self.base_speaker_tts.tts(text, src_path, speaker=self.speaker, language='English', speed=self.speed)
         
         self.target_se, _ = se_extractor.get_se(self.reference_file, self.tone_color_converter, vad=True)
 
