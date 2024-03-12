@@ -7,26 +7,30 @@ from PIL import Image
 import json
 import threading
 import queue
+from reasoning import MainChatModel
 
 class PersonaImageCreator:
-    def __init__(self, persona):
+    def __init__(self, persona, reasoning=MainChatModel(temperature=0, max_tokens=-1)):
         self.path = r"C:\Users\T-GAMER\Desktop\Projetos\ComfyUI_windows_portable\ComfyUI"
+        self.reasoning = reasoning
         self.persona = persona
+
         with open(f"personas/{self.persona}.json", "r") as f:
             data = json.load(f)
             self.original_appearance = data['appearance']
+            self.appearance = data['appearance']
             self.model = data.get('model', 'hassakuHentaiModel_v13.safetensors')
-        self.image_queue = queue.Queue()
-        self.generation_done = False  # Indica se a geração de imagens foi concluída
 
-    def create_prompt(self):
-        with open(f"personas/{self.persona}.json", "r") as f:
-            appearance = json.load(f)['appearance']
-            
+    def create_image_prompt(self):      
         prompt = ""
-        for key, value in appearance.items():
+        for key, value in self.appearance.items():
+            if value == "":
+                value = f"No {key}"
             prompt += f"{value}, "
         return prompt
+
+    def change_appearance(self, prompt):
+        self.appearance = self.reasoning.change_sd_prompt(self.appearance, prompt)
 
     def get_value_at_index(self, obj: Union[Sequence, Mapping], index: int) -> Any:
         try:
@@ -128,33 +132,24 @@ class PersonaImageCreator:
                 saveimage_9 = saveimage.save_images(
                     filename_prefix="ComfyUI", images=self.get_value_at_index(vaedecode_8, 0)
                 )
-                self.image_queue.put(saveimage_9['ui']['images'][0]['filename'])
-            self.generation_done = True
+                self.image_name = saveimage_9['ui']['images'][0]['filename']
 
     def display_images(self):
-        while not (self.generation_done and self.image_queue.empty()):
-            try:
-                image_name = self.image_queue.get(timeout=10)  # Espera por uma imagem ou timeout
-                image_path = os.path.join(self.path, "output", image_name)
-                image = Image.open(image_path)
-                image.show()
-                self.image_queue.task_done()
-            except queue.Empty:
-                # Se a fila estiver vazia e a geração concluída, sai do loop
-                break
+        image_path = os.path.join(self.path, "output", self.image_name)
+        image = Image.open(image_path)
+        image.show()
 
-    def start(self, prompt, batch_size=1):
-        # Método para iniciar as threads de geração e exibição de imagens
-        generation_thread = threading.Thread(target=self.run, args=(prompt, batch_size))
-        display_thread = threading.Thread(target=self.display_images)
-        
-        generation_thread.start()
-        display_thread.start()
-
-        generation_thread.join()  # Aguarda a conclusão da thread de geração
+    def start(self, batch_size=1):
+        image_prompt = self.create_image_prompt()
+        self.run(image_prompt, batch_size)
+        self.display_images()
+        while True:
+            prompt = input("What do you want to change?\n")
+            self.change_appearance(prompt)
+            image_prompt = self.create_image_prompt()
+            self.run(image_prompt, batch_size)
+            self.display_images()
 
 if __name__ == "__main__":
     pipeline = PersonaImageCreator(persona="jess")
-    
-    prompt = pipeline.create_prompt()
-    pipeline.start(prompt, batch_size=2)
+    pipeline.start()

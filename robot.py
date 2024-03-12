@@ -5,7 +5,7 @@ import json
 
 class Robot:
     def __init__(self, model_name="base", samplerate=16000, verbose=True):
-        self.persona = "alya"
+        self.persona = "jess"
         with open(f"personas/{self.persona}.json", "r") as f:
             self.config = json.load(f)
 
